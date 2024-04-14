@@ -37,98 +37,98 @@ app.use(cors({
   credentials: true
 }));
 
-io.on('connection', (socket) => {
-  let user1; // Define user1 variable to store the username
+// io.on('connection', (socket) => {
+//   let user1; // Define user1 variable to store the username
 
-  console.log('A user connected');
+//   console.log('A user connected');
 
- try {
-   socket.on("set_username", async (username) => {
-     try {
-       user1 = username; // Store the username
-       console.log("Username received from client:", user1);
+//  try {
+//    socket.on("set_username", async (username) => {
+//      try {
+//        user1 = username; // Store the username
+//        console.log("Username received from client:", user1);
  
-       // Find the user in the database and update status to online
-       const user = await User.findOneAndUpdate({ username: user1 }, { status: "online" }, { new: true });
-       if (user) {
-         console.log(`User ${user.username} status updated to online`);
-       } else {
-         console.log("User not found in the database for online update");
-       }
-     } catch (error) {
-       console.error("Error updating user status to online", error);
-     }
-   });
-   // Join room
-   socket.on('join', (room) => {
-     socket.join(room);
-     console.log(`User joined room: ${room}`);
-   });
+//        // Find the user in the database and update status to online
+//        const user = await User.findOneAndUpdate({ username: user1 }, { status: "online" }, { new: true });
+//        if (user) {
+//          console.log(`User ${user.username} status updated to online`);
+//        } else {
+//          console.log("User not found in the database for online update");
+//        }
+//      } catch (error) {
+//        console.error("Error updating user status to online", error);
+//      }
+//    });
+//    // Join room
+//    socket.on('join', (room) => {
+//      socket.join(room);
+//      console.log(`User joined room: ${room}`);
+//    });
  
-   // Send message
+//    // Send message
    
-   socket.on('message_read', async (messageId) => {
-     try {
-       // Update message status to 'seen' in the database
-       const message = await Message.findByIdAndUpdate(messageId, { status: 'seen' }, { new: true });
+//    socket.on('message_read', async (messageId) => {
+//      try {
+//        // Update message status to 'seen' in the database
+//        const message = await Message.findByIdAndUpdate(messageId, { status: 'seen' }, { new: true });
  
-       if (message) {
-         console.log(`Message ${messageId} status updated to seen`);
-       } else {
-         console.log("Message not found in the database for status update");
-       }
-     } catch (error) {
-       console.error("Error updating message status to seen", error);
-     }
-   });
-   // Retrieve messages
-   socket.on('get_messages', async (room) => {
-     try {
-       const messages = await Message.find({ roomName: room }).sort({ createdAt: -1 }).limit(20);;
-       socket.emit('all_messages',messages.reverse());
-     } catch (error) {
-       console.error("Error retrieving messages from database", error);
-     }
-   });
-   socket.on('chat message', async (data) => {
-    const { msg, room, receiver, sender } = data;
-    try {
-      // Save message to database
-      const newMessage = new Message({ sender, receiver, message: msg, roomName: room });
-      await newMessage.save();
+//        if (message) {
+//          console.log(`Message ${messageId} status updated to seen`);
+//        } else {
+//          console.log("Message not found in the database for status update");
+//        }
+//      } catch (error) {
+//        console.error("Error updating message status to seen", error);
+//      }
+//    });
+//    // Retrieve messages
+//    socket.on('get_messages', async (room) => {
+//      try {
+//        const messages = await Message.find({ roomName: room }).sort({ createdAt: -1 }).limit(20);;
+//        socket.emit('all_messages',messages.reverse());
+//      } catch (error) {
+//        console.error("Error retrieving messages from database", error);
+//      }
+//    });
+//    socket.on('chat message', async (data) => {
+//     const { msg, room, receiver, sender } = data;
+//     try {
+//       // Save message to database
+//       const newMessage = new Message({ sender, receiver, message: msg, roomName: room });
+//       await newMessage.save();
 
-      // Emit message to everyone in the room
-      io.to(room).emit('chat message', newMessage);
+//       // Emit message to everyone in the room
+//       io.to(room).emit('chat message', newMessage);
 
-      console.log("Message value is ", msg);
-    } catch (error) {
-      console.error("Error saving message to database", error);
-    }
-  });
- } catch (error) {
-  console.log(error)
- }
+//       console.log("Message value is ", msg);
+//     } catch (error) {
+//       console.error("Error saving message to database", error);
+//     }
+//   });
+//  } catch (error) {
+//   console.log(error)
+//  }
 
-  // Update message status when read by the receiver
+//   // Update message status when read by the receiver
  
-  socket.on('disconnect', async () => {
-    console.log(`User ${user1} disconnected`);
-    if (user1) {
-      try {
-        // Update user status to offline in the database
-        const user = await User.findOneAndUpdate({ username: user1 }, { status: "offline" }, { new: true });
+//   socket.on('disconnect', async () => {
+//     console.log(`User ${user1} disconnected`);
+//     if (user1) {
+//       try {
+//         // Update user status to offline in the database
+//         const user = await User.findOneAndUpdate({ username: user1 }, { status: "offline" }, { new: true });
 
-        if (user) {
-          console.log(`User ${user1} status updated to offline`);
-        } else {
-          console.log("User not found in the database for offline update");
-        }
-      } catch (error) {
-        console.error("Error updating user status to offline", error);
-      }
-    }
-  });
-});
+//         if (user) {
+//           console.log(`User ${user1} status updated to offline`);
+//         } else {
+//           console.log("User not found in the database for offline update");
+//         }
+//       } catch (error) {
+//         console.error("Error updating user status to offline", error);
+//       }
+//     }
+//   });
+// });
 
 
 
