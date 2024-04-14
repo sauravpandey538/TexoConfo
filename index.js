@@ -156,7 +156,9 @@ connectDB()
 
 
 
-
+app.get("/",(req,res)=>{
+res.send.json({status:"Working"})
+})
 
 
 app.post("/signup",async(req,res)=>{
